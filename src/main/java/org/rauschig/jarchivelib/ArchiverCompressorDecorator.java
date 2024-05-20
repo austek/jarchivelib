@@ -1,12 +1,12 @@
 /**
  *    Copyright 2013 Thomas Rausch
- *
+ * <p>
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *
+ * <p>
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,8 +34,8 @@ import org.apache.commons.compress.compressors.CompressorException;
  */
 class ArchiverCompressorDecorator implements Archiver {
 
-    private CommonsArchiver archiver;
-    private CommonsCompressor compressor;
+    private final CommonsArchiver archiver;
+    private final CommonsCompressor compressor;
 
     /**
      * Decorates the given Archiver with the given Compressor.
@@ -58,7 +58,7 @@ class ArchiverCompressorDecorator implements Archiver {
         IOUtils.requireDirectory(destination);
 
         File temp = File.createTempFile(destination.getName(), archiver.getFilenameExtension(), destination);
-        File destinationArchive = null;
+        File destinationArchive;
 
         try {
             temp = archiver.create(temp.getName(), temp.getParentFile(), sources);
@@ -84,16 +84,11 @@ class ArchiverCompressorDecorator implements Archiver {
             throw new FileNotFoundException(String.format("Archive %s does not exist.", archive.getAbsolutePath()));
         }
 
-        InputStream archiveStream = null;
-        try {
-
-            archiveStream = new BufferedInputStream(new FileInputStream(archive));
+        try(InputStream archiveStream = new BufferedInputStream(new FileInputStream(archive))) {
             archiver.extract(compressor.decompressingStream(archiveStream), destination);
         } catch (FileNotFoundException e) {
             // Java throws F-N-F for no access, and callers expect I-A-E for that.
             throw new IllegalArgumentException(String.format("Access control or other error opening %s", archive.getAbsolutePath()), e);
-        } finally {
-            IOUtils.closeQuietly(archiveStream);
         }
     }
 
@@ -107,9 +102,7 @@ class ArchiverCompressorDecorator implements Archiver {
     public ArchiveStream stream(File archive) throws IOException {
         try {
             return new CommonsArchiveStream(createArchiveInputStream(archiver, createCompressorInputStream(archive)));
-        } catch (ArchiveException e) {
-            throw new IOException(e);
-        } catch (CompressorException e) {
+        } catch (ArchiveException | CompressorException e) {
             throw new IOException(e);
         }
     }

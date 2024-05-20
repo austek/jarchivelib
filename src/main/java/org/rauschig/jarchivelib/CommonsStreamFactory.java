@@ -1,12 +1,12 @@
 /**
  *    Copyright 2013 Thomas Rausch
- *
+ * <p>
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *
+ * <p>
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
@@ -42,8 +43,8 @@ final class CommonsStreamFactory {
 
     }
 
-    private static CompressorStreamFactory compressorStreamFactory;
-    private static ArchiveStreamFactory archiveStreamFactory;
+    private static final CompressorStreamFactory compressorStreamFactory;
+    private static final ArchiveStreamFactory archiveStreamFactory;
 
     static {
         archiveStreamFactory = new ArchiveStreamFactory();
@@ -51,32 +52,32 @@ final class CommonsStreamFactory {
     }
 
     /**
-     * @see {@link ArchiveStreamFactory#createArchiveInputStream(String, InputStream)}
+     * @see ArchiveStreamFactory#createArchiveInputStream(String, InputStream)
      */
-    static ArchiveInputStream createArchiveInputStream(String archiverName, InputStream in) throws ArchiveException {
+    static ArchiveInputStream<ArchiveEntry> createArchiveInputStream(String archiverName, InputStream in) throws ArchiveException {
         return archiveStreamFactory.createArchiveInputStream(archiverName, in);
     }
 
     /**
-     * @see {@link ArchiveStreamFactory#createArchiveInputStream(String, InputStream)}
+     * @see ArchiveStreamFactory#createArchiveInputStream(String, InputStream)
      */
-    static ArchiveInputStream createArchiveInputStream(ArchiveFormat archiveFormat, InputStream in)
+    static ArchiveInputStream<ArchiveEntry> createArchiveInputStream(ArchiveFormat archiveFormat, InputStream in)
         throws ArchiveException {
         return createArchiveInputStream(archiveFormat.getName(), in);
     }
 
     /**
-     * @see {@link ArchiveStreamFactory#createArchiveInputStream(String, InputStream)}
+     * @see ArchiveStreamFactory#createArchiveInputStream(String, InputStream)
      */
-    static ArchiveInputStream createArchiveInputStream(CommonsArchiver archiver, InputStream in)
+    static ArchiveInputStream<ArchiveEntry> createArchiveInputStream(CommonsArchiver archiver, InputStream in)
         throws ArchiveException {
         return createArchiveInputStream(archiver.getArchiveFormat(), in);
     }
 
     /**
-     * @see {@link ArchiveStreamFactory#createArchiveInputStream(InputStream)};
+     * @see ArchiveStreamFactory#createArchiveInputStream(InputStream)
      */
-    static ArchiveInputStream createArchiveInputStream(InputStream in) throws ArchiveException {
+    static ArchiveInputStream<ArchiveEntry> createArchiveInputStream(InputStream in) throws ArchiveException {
         return archiveStreamFactory.createArchiveInputStream(new BufferedInputStream(in));
     }
 
@@ -88,19 +89,19 @@ final class CommonsStreamFactory {
      * @throws IOException propagated IOException when creating the FileInputStream.
      * @throws ArchiveException if the archiver name is not known
      */
-    static ArchiveInputStream createArchiveInputStream(File archive) throws IOException, ArchiveException {
+    static ArchiveInputStream<ArchiveEntry> createArchiveInputStream(File archive) throws IOException, ArchiveException {
         return createArchiveInputStream(new BufferedInputStream(new FileInputStream(archive)));
     }
 
     /**
-     * @see {@link ArchiveStreamFactory#createArchiveOutputStream(String, OutputStream)};
+     * @see ArchiveStreamFactory#createArchiveOutputStream(String, OutputStream)
      */
-    static ArchiveOutputStream createArchiveOutputStream(String archiverName, OutputStream out)
+    static ArchiveOutputStream<ArchiveEntry> createArchiveOutputStream(String archiverName, OutputStream out)
         throws ArchiveException {
         return archiveStreamFactory.createArchiveOutputStream(archiverName, out);
     }
 
-    static ArchiveOutputStream createArchiveOutputStream(ArchiveFormat format, File archive) throws IOException,
+    static ArchiveOutputStream<ArchiveEntry> createArchiveOutputStream(ArchiveFormat format, File archive) throws IOException,
         ArchiveException {
         return createArchiveOutputStream(format.getName(), new FileOutputStream(archive));
     }
@@ -115,7 +116,7 @@ final class CommonsStreamFactory {
      * @throws IOException propagated IOExceptions when creating the FileOutputStream.
      * @throws ArchiveException if the archiver name is not known
      */
-    static ArchiveOutputStream createArchiveOutputStream(CommonsArchiver archiver, File archive) throws IOException,
+    static ArchiveOutputStream<ArchiveEntry> createArchiveOutputStream(CommonsArchiver archiver, File archive) throws IOException,
         ArchiveException {
         return createArchiveOutputStream(archiver.getArchiveFormat(), archive);
     }
@@ -148,7 +149,7 @@ final class CommonsStreamFactory {
     }
 
     /**
-     * @see {@link CompressorStreamFactory#createCompressorInputStream(String, java.io.InputStream)}
+     * @see CompressorStreamFactory#createCompressorInputStream(String, java.io.InputStream)
      */
     static CompressorInputStream createCompressorInputStream(CompressionType compressionType, InputStream in)
         throws CompressorException {
@@ -156,7 +157,7 @@ final class CommonsStreamFactory {
     }
 
     /**
-     * @see {@link CompressorStreamFactory#createCompressorInputStream(InputStream)};
+     * @see CompressorStreamFactory#createCompressorInputStream(InputStream)
      */
     static CompressorInputStream createCompressorInputStream(InputStream in) throws CompressorException {
         return compressorStreamFactory.createCompressorInputStream(in);
@@ -183,7 +184,7 @@ final class CommonsStreamFactory {
     }
 
     /**
-     * @see {@link CompressorStreamFactory#createCompressorOutputStream(String, OutputStream)};
+     * @see CompressorStreamFactory#createCompressorOutputStream(String, OutputStream)
      */
     static CompressorOutputStream createCompressorOutputStream(String compressorName, OutputStream out)
         throws CompressorException {

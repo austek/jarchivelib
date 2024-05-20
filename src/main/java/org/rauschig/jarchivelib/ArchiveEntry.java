@@ -1,12 +1,12 @@
 /**
  *    Copyright 2013 Thomas Rausch
- *
+ * <p>
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *
+ * <p>
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@ import java.util.Date;
 
 /**
  * The entry of an archive.
- * 
+ * <p>
  * The life of an {@link ArchiveEntry} is dependent on the status of the {@link ArchiveStream} it came from. Once
  * retrieved via {@link ArchiveStream#getNextEntry()}, the entry can be used as long as the {@code ArchiveStream}
  * remains on this entry, i.e. {@code getNextEntry()} was not called, and the stream was not since closed.
@@ -31,6 +31,7 @@ public interface ArchiveEntry {
     /**
      * Special value indicating that the size is unknown
      */
+    @SuppressWarnings("unused")
     static final long UNKNOWN_SIZE = -1;
 
     /**
@@ -63,7 +64,7 @@ public interface ArchiveEntry {
 
     /**
      * Extracts the entry to the given destination directory.
-     * 
+     * <p>
      * The destination is expected to be a writable directory.
      * 
      * @param destination the directory to extract the value to
@@ -73,6 +74,7 @@ public interface ArchiveEntry {
      * @throws IllegalArgumentException if the destination is not a directory, or a directory can not be created at the
      *         given location
      */
+    @SuppressWarnings("UnusedReturnValue")
     File extract(File destination) throws IOException, IllegalStateException, IllegalArgumentException;
 
 }

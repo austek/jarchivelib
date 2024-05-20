@@ -1,12 +1,12 @@
 /**
  *    Copyright 2013 Thomas Rausch
- *
+ * <p>
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *
+ * <p>
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,14 +57,9 @@ class CommonsArchiver implements Archiver {
 
         File archiveFile = createNewArchiveFile(archive, getFilenameExtension(), destination);
 
-        ArchiveOutputStream outputStream = null;
-        try {
-            outputStream = createArchiveOutputStream(archiveFile);
+        try(ArchiveOutputStream<?> outputStream =  createArchiveOutputStream(archiveFile)) {
             writeToArchive(sources, outputStream);
-
             outputStream.flush();
-        } finally {
-            IOUtils.closeQuietly(outputStream);
         }
 
         return archiveFile;
@@ -76,30 +71,26 @@ class CommonsArchiver implements Archiver {
 
         IOUtils.requireDirectory(destination);
 
-        ArchiveInputStream input = null;
-        try {
-            input = createArchiveInputStream(archive);
+        try(ArchiveInputStream<?> input = createArchiveInputStream(archive)) {
             extract(input, destination);
-
-        } finally {
-            IOUtils.closeQuietly(input);
         }
     }
 
     @Override
     public void extract(InputStream archive, File destination) throws IOException {
-        ArchiveInputStream input = createArchiveInputStream(archive);
-        extract(input, destination);
+        extract(createArchiveInputStream(archive), destination);
     }
 
-    private void extract(ArchiveInputStream input, File destination) throws IOException {
+    private <T extends ArchiveEntry> void extract(ArchiveInputStream<T> input, File destination) throws IOException {
         ArchiveEntry entry;
         while ((entry = input.getNextEntry()) != null) {
             File file = new File(destination, entry.getName());
 
             if (entry.isDirectory()) {
+                //noinspection ResultOfMethodCallIgnored
                 file.mkdirs();
             } else {
+                //noinspection ResultOfMethodCallIgnored
                 file.getParentFile().mkdirs();
                 IOUtils.copy(input, file);
             }
@@ -126,7 +117,7 @@ class CommonsArchiver implements Archiver {
      * @return a new ArchiveInputStream for the given archive file
      * @throws IOException propagated IO exceptions
      */
-    protected ArchiveInputStream createArchiveInputStream(File archive) throws IOException {
+    protected ArchiveInputStream<ArchiveEntry> createArchiveInputStream(File archive) throws IOException {
         try {
             return CommonsStreamFactory.createArchiveInputStream(archive);
         } catch (ArchiveException e) {
@@ -142,7 +133,7 @@ class CommonsArchiver implements Archiver {
      * @return a new ArchiveInputStream for the given archive file
      * @throws IOException propagated IO exceptions
      */
-    protected ArchiveInputStream createArchiveInputStream(InputStream archive) throws IOException {
+    protected ArchiveInputStream<ArchiveEntry> createArchiveInputStream(InputStream archive) throws IOException {
         try {
             return CommonsStreamFactory.createArchiveInputStream(archive);
         } catch (ArchiveException e) {
@@ -162,8 +153,8 @@ class CommonsArchiver implements Archiver {
         try {
             ArchiveOutputStream archiveOutputStream = CommonsStreamFactory.createArchiveOutputStream(this, archiveFile);
 
-            if (archiveOutputStream instanceof TarArchiveOutputStream) {
-                ((TarArchiveOutputStream) archiveOutputStream).setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
+            if (archiveOutputStream instanceof TarArchiveOutputStream tarArchiveOutputStream) {
+                (tarArchiveOutputStream).setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
             }
 
             return archiveOutputStream;
@@ -267,12 +258,8 @@ class CommonsArchiver implements Archiver {
         archive.putArchiveEntry(entry);
 
         if (!entry.isDirectory()) {
-            FileInputStream input = null;
-            try {
-                input = new FileInputStream(file);
+            try(FileInputStream input = new FileInputStream(file)) {
                 IOUtils.copy(input, archive);
-            } finally {
-                IOUtils.closeQuietly(input);
             }
         }
 

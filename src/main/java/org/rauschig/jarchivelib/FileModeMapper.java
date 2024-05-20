@@ -1,12 +1,12 @@
 /**
  *    Copyright 2013 Thomas Rausch
- *
+ * <p>
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *
+ * <p>
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,18 +15,17 @@
  */
 package org.rauschig.jarchivelib;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import org.apache.commons.compress.archivers.ArchiveEntry;
 
 /**
  * Reads *nix file mode flags of commons-compress' ArchiveEntry (where possible) and maps them onto Files on the file
@@ -35,11 +34,11 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 abstract class FileModeMapper {
 
     private static final Logger LOG = Logger.getLogger(FileModeMapper.class.getCanonicalName());
-    private static boolean IS_POSIX = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    private static final boolean IS_POSIX = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
 
-    private ArchiveEntry archiveEntry;
+    private final ArchiveEntry archiveEntry;
 
-    public FileModeMapper(ArchiveEntry archiveEntry) {
+    protected FileModeMapper(ArchiveEntry archiveEntry) {
         this.archiveEntry = archiveEntry;
     }
 
@@ -95,6 +94,7 @@ abstract class FileModeMapper {
      * Uses an AttributeAccessor to extract the posix file permissions from the ArchiveEntry and sets them
      * on the given file.
      */
+    @SuppressWarnings("OctalInteger")
     public static class PosixPermissionMapper extends FileModeMapper {
         public static final int UNIX_PERMISSION_MASK = 0777;
 
@@ -125,23 +125,23 @@ abstract class FileModeMapper {
         }
     }
 
+    @SuppressWarnings("OctalInteger")
     public static class PosixFilePermissionsMapper {
 
-        public static Map<Integer, PosixFilePermission> intToPosixFilePermission = new HashMap<>();
+        public static final Map<Integer, PosixFilePermission> intToPosixFilePermission = Map.of(
+                0400, PosixFilePermission.OWNER_READ,
+                0200, PosixFilePermission.OWNER_WRITE,
+                0100, PosixFilePermission.OWNER_EXECUTE,
 
-        static {
-            intToPosixFilePermission.put(0400, PosixFilePermission.OWNER_READ);
-            intToPosixFilePermission.put(0200, PosixFilePermission.OWNER_WRITE);
-            intToPosixFilePermission.put(0100, PosixFilePermission.OWNER_EXECUTE);
+                0040, PosixFilePermission.GROUP_READ,
+                0020, PosixFilePermission.GROUP_WRITE,
+                0010, PosixFilePermission.GROUP_EXECUTE,
 
-            intToPosixFilePermission.put(0040, PosixFilePermission.GROUP_READ);
-            intToPosixFilePermission.put(0020, PosixFilePermission.GROUP_WRITE);
-            intToPosixFilePermission.put(0010, PosixFilePermission.GROUP_EXECUTE);
+                0004, PosixFilePermission.OTHERS_READ,
+                0002, PosixFilePermission.OTHERS_WRITE,
+                0001, PosixFilePermission.OTHERS_EXECUTE
 
-            intToPosixFilePermission.put(0004, PosixFilePermission.OTHERS_READ);
-            intToPosixFilePermission.put(0002, PosixFilePermission.OTHERS_WRITE);
-            intToPosixFilePermission.put(0001, PosixFilePermission.OTHERS_EXECUTE);
-        }
+        );
 
         public Set<PosixFilePermission> map(int mode) {
             Set<PosixFilePermission> permissionSet = new HashSet<>();

@@ -1,12 +1,12 @@
 /**
  *    Copyright 2013 Thomas Rausch
- *
+ * <p>
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *
+ * <p>
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,18 +57,11 @@ class CommonsCompressor implements Compressor {
             destination = new File(destination, getCompressedFilename(source));
         }
 
-        CompressorOutputStream compressed = null;
-        BufferedInputStream input = null;
-        try {
-            input = new BufferedInputStream(new FileInputStream(source));
-            compressed = createCompressorOutputStream(this, destination);
-
+        try(BufferedInputStream input = new BufferedInputStream(new FileInputStream(source));
+            CompressorOutputStream compressed = createCompressorOutputStream(this, destination)) {
             IOUtils.copy(input, compressed);
         } catch (CompressorException e) {
             throw new IOException(e);
-        } finally {
-            IOUtils.closeQuietly(compressed);
-            IOUtils.closeQuietly(input);
         }
     }
 
@@ -81,17 +74,11 @@ class CommonsCompressor implements Compressor {
             destination = new File(destination, getDecompressedFilename(source));
         }
 
-        CompressorInputStream compressed = null;
-        FileOutputStream output = null;
-        try {
-            compressed = createCompressorInputStream(getCompressionType(), source);
-            output = new FileOutputStream(destination);
+        try(CompressorInputStream compressed = createCompressorInputStream(getCompressionType(), source);
+            FileOutputStream output = new FileOutputStream(destination);) {
             IOUtils.copy(compressed, output);
         } catch (CompressorException e) {
             throw new IOException(e);
-        } finally {
-            IOUtils.closeQuietly(compressed);
-            IOUtils.closeQuietly(output);
         }
     }
 

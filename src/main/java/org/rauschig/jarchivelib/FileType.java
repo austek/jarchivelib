@@ -1,12 +1,12 @@
 /**
  *    Copyright 2013 Thomas Rausch
- *
+ * <p>
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *
+ * <p>
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public final class FileType {
 
-    private static final Map<String, FileType> MAP = new LinkedHashMap<String, FileType>();
+    private static final Map<String, FileType> MAP = new LinkedHashMap<>();
 
     /**
      * Special case object for an unknown archive/compression file type.
@@ -173,7 +173,7 @@ public final class FileType {
         MAP.put(suffix, new FileType(suffix, compressionType));
     }
 
-    private static void add(String suffix, ArchiveFormat archiveFormat, CompressionType compressionType) {
+    private static void add(String suffix, @SuppressWarnings("SameParameterValue") ArchiveFormat archiveFormat, CompressionType compressionType) {
         MAP.put(suffix, new FileType(suffix, archiveFormat, compressionType));
     }
 

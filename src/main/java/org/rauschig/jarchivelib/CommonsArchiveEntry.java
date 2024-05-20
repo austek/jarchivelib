@@ -1,12 +1,12 @@
 /**
  *    Copyright 2013 Thomas Rausch
- *
+ * <p>
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *
+ * <p>
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,12 +27,12 @@ class CommonsArchiveEntry implements ArchiveEntry {
     /**
      * The wrapped {@code ArchiveEntry} entry.
      */
-    private org.apache.commons.compress.archivers.ArchiveEntry entry;
+    private final org.apache.commons.compress.archivers.ArchiveEntry entry;
 
     /**
      * The {@link ArchiveStream} this entry belongs to.
      */
-    private ArchiveStream stream;
+    private final ArchiveStream stream;
 
     CommonsArchiveEntry(ArchiveStream stream, org.apache.commons.compress.archivers.ArchiveEntry entry) {
         this.stream = stream;
@@ -71,8 +71,10 @@ class CommonsArchiveEntry implements ArchiveEntry {
         File file = new File(destination, entry.getName());
 
         if (entry.isDirectory()) {
+            //noinspection ResultOfMethodCallIgnored
             file.mkdirs();
         } else {
+            //noinspection ResultOfMethodCallIgnored
             file.getParentFile().mkdirs();
             IOUtils.copy(stream, file);
         }

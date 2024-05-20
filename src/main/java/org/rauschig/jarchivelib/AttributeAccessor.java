@@ -1,12 +1,12 @@
 /**
  *    Copyright 2013 Thomas Rausch
- *
+ * <p>
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *
+ * <p>
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,9 +31,9 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
  */
 abstract class AttributeAccessor<E extends ArchiveEntry> {
 
-    private E entry;
+    private final E entry;
 
-    public AttributeAccessor(E entry) {
+    protected AttributeAccessor(E entry) {
         this.entry = entry;
     }
 
@@ -50,7 +50,7 @@ abstract class AttributeAccessor<E extends ArchiveEntry> {
      * Returns the unix file mode.
      * 
      * @return unix file mode flags
-     * @throws java.io.IOException
+     * @throws IOException propagated I/O errors by {@code java.io}
      */
     public abstract int getMode() throws IOException;
 
@@ -61,16 +61,16 @@ abstract class AttributeAccessor<E extends ArchiveEntry> {
      * @return a new attribute accessor instance
      */
     public static AttributeAccessor<?> create(ArchiveEntry entry) {
-        if (entry instanceof TarArchiveEntry) {
-            return new TarAttributeAccessor((TarArchiveEntry) entry);
-        } else if (entry instanceof ZipArchiveEntry) {
-            return new ZipAttributeAccessor((ZipArchiveEntry) entry);
-        } else if (entry instanceof CpioArchiveEntry) {
-            return new CpioAttributeAccessor((CpioArchiveEntry) entry);
-        } else if (entry instanceof ArjArchiveEntry) {
-            return new ArjAttributeAccessor((ArjArchiveEntry) entry);
-        } else if (entry instanceof ArArchiveEntry) {
-            return new ArAttributeAccessor((ArArchiveEntry) entry);
+        if (entry instanceof TarArchiveEntry tarArchiveEntry) {
+            return new TarAttributeAccessor(tarArchiveEntry);
+        } else if (entry instanceof ZipArchiveEntry zipArchiveEntry) {
+            return new ZipAttributeAccessor(zipArchiveEntry);
+        } else if (entry instanceof CpioArchiveEntry cpioArchiveEntry) {
+            return new CpioAttributeAccessor(cpioArchiveEntry);
+        } else if (entry instanceof ArjArchiveEntry arjArchiveEntry) {
+            return new ArjAttributeAccessor(arjArchiveEntry);
+        } else if (entry instanceof ArArchiveEntry arArchiveEntry) {
+            return new ArAttributeAccessor(arArchiveEntry);
         }
 
         return new FallbackAttributeAccessor(entry);
